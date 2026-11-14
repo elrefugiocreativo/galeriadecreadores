@@ -15,6 +15,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://elrefugiocreativo.github.io/galeriadecreadores/og.jpg">
+<link rel="preload" as="image" href="papel.jpg">
 <link rel="icon" type="image/png" href="logo-casa.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -126,6 +127,7 @@ input[type=search]::-webkit-search-cancel-button { -webkit-appearance: none; dis
 .frame-bg { position: absolute; inset: 0; background: var(--fc); filter: url(#crayon); }
 .frame-bg::after { content: ""; position: absolute; inset: 0; mix-blend-mode: multiply; opacity: .55;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.6 1.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); }
+.frame-img { position: absolute; left: -5%; top: -4%; width: 110%; height: 108%; display: block; pointer-events: none; user-select: none; }
 .frame .pic { position: absolute; top: 8.8%; bottom: 8.8%; left: 11%; right: 11%; overflow: hidden; background: var(--papel-2); display: grid; place-items: center; }
 .frame .pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .frame .pic .ini { font-family: var(--mano); font-weight: 900; font-size: clamp(40px, 7vw, 70px); color: var(--tc); line-height: 1; }
@@ -286,19 +288,10 @@ function hash(n) { let h = 2166136261; for (const ch of String(n)) { h ^= ch.cha
 
 function frameHTML(m, big) {
   const st = styleOf(m);
-  // dibujitos repartidos sobre el borde (en % del marco)
-  const pts = [];
-  const nx = big ? 6 : 5, ny = big ? 7 : 6;
-  for (let i = 0; i < nx; i++) { const x = 8 + i * (84 / (nx - 1)); pts.push([x, 4.4], [x, 95.6]); }
-  for (let j = 1; j < ny - 1; j++) { const y = 4.4 + j * (91.2 / (ny - 1)); pts.push([5.5, y], [94.5, y]); }
-  const h = hash(m.nombre + m.id);
-  const motifs = pts.map(([x, y], k) => {
-    const r = ((h >> (k % 24)) % 40) - 20;
-    return `<span class="m" style="left:${x}%;top:${y}%;--r:${r}deg"><svg><use href="#m-${st.m}"/></svg></span>`;
-  }).join('');
+  const k = m.id % STYLES.length;
   const ini = m.nombre.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
-  const pic = m.foto ? `<img src="${esc(m.foto)}" alt="" loading="lazy">` : `<span class="ini">${esc(ini)}</span>`;
-    return `<div class="frame" style="--fc:${st.fc};--tc:${st.tc};--mc:${st.mc}"><div class="frame-bg"></div><div class="pic">${pic}</div>${motifs}</div>`;
+  const pic = m.foto ? `<img src="${esc(m.foto)}" alt="" loading="lazy" decoding="async">` : `<span class="ini">${esc(ini)}</span>`;
+  return `<div class="frame" style="--fc:${st.fc};--tc:${st.tc};--mc:${st.mc}"><img class="frame-img" src="marcos/w${k}${big ? 'b' : 's'}.webp" alt="" decoding="async"><div class="pic">${pic}</div></div>`;
 }
 
 const placeText = m => {
@@ -530,6 +523,8 @@ async function boot() {
     return;
   }
   prep(); computeIndex(); fillSelects(); renderChips(); render();
+  const pre = () => { STYLES.forEach((_, k) => { const i = new Image(); i.src = `marcos/w${k}b.webp`; }); const p = new Image(); p.src = 'papel.jpg'; };
+  ('requestIdleCallback' in window) ? requestIdleCallback(pre, { timeout: 2500 }) : setTimeout(pre, 1200);
 }
 boot();
 </script>
