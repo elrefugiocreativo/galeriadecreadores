@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Galería de Creadores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Nunito:wght@800;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* papel de cuaderno + marcos de crayón; cada miembro trae su color y su dibujito */
+  --papel: #F4F0E8;
+  --papel-2: #FBF9F4;
+  --tinta: #1F1D1A;
+  --tinta-suave: #6A645A;
+  --linea: #D9D1C2;
+  --vino: #8E242A;
+  --azul: #4E5B81;
+  --display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --mano: "Arial Rounded MT Bold", "Arial Rounded MT", "Nunito", "Varela Round", system-ui, sans-serif;
+  --mono: "Courier Prime", "Courier New", monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--display);
+  font-variation-settings: "wdth" 100;
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+/* grano de papel */
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .5; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .4 0 0 0 0 .33 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+body > * { position: relative; z-index: 1; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px dashed var(--azul); outline-offset: 3px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 40px); }
+.mono { font-family: var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+.hand { font-family: var(--mano); }
+
+/* ---------- cabecera ---------- */
+header.top { padding: clamp(36px, 6vw, 64px) 0 24px; overflow: hidden; }
+.top-grid { display: grid; grid-template-columns: 1fr auto; gap: 24px 40px; align-items: end; }
+h1 {
+  margin: 0; font-weight: 800; font-variation-settings: "wdth" 75; text-transform: uppercase;
+  font-size: clamp(52px, 9vw, 116px); line-height: .86; letter-spacing: -0.01em; color: var(--tinta);
+  text-wrap: balance;
+}
+h1 .sub { display: block; font-family: var(--mano); font-weight: 900; text-transform: none; color: var(--vino);
+  font-size: .3em; letter-spacing: 0; line-height: 1; margin-top: .18em; transform: rotate(-2deg); transform-origin: left; }
+.logo-nombre { display: block; height: clamp(26px, 3.6vw, 44px); width: auto; margin-top: 14px; }
+.top-grid { position: relative; }
+.logo-casa { position: absolute; top: -8px; right: clamp(16px, 4vw, 40px); height: clamp(64px, 9vw, 112px); width: auto; transform: rotate(4deg); }
+.brand-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+@media (max-width: 760px) { .logo-casa { position: static; height: 58px; margin-top: -10px; } }
+.lede { max-width: 44ch; margin: 18px 0 0; font-size: 17px; color: var(--tinta-suave); }
+.stats { display: flex; gap: 26px; margin: 0; padding: 0; list-style: none; }
+.stats li { display: grid; text-align: left; }
+.stats strong { font-family: var(--display); font-variation-settings: "wdth" 75; font-weight: 800; font-size: 46px; line-height: 1; font-variant-numeric: tabular-nums; }
+.stats span { font-family: var(--mono); text-transform: uppercase; font-size: 11px; letter-spacing: .08em; color: var(--tinta-suave); }
+.deco { position: absolute; pointer-events: none; }
+
+/* ---------- buscador ---------- */
+.search-bar { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--papel) 92%, transparent); backdrop-filter: blur(8px); padding: 12px 0; }
+.pill { display: flex; align-items: center; background: var(--papel-2); border: 1px solid var(--linea); border-radius: 999px; min-height: 46px; padding: 0 6px 0 18px; transition: border-color .15s, box-shadow .15s; }
+.pill:focus-within { border-color: var(--tinta); box-shadow: 0 0 0 3px color-mix(in srgb, var(--azul) 12%, transparent); }
+.pill .q { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.pill .q svg { flex: none; opacity: .55; }
+.pill input { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; font-size: 15px; color: var(--tinta); padding: 10px 0; }
+.pill input::placeholder { color: #9A9387; }
+.pill input:focus { outline: none; }
+input[type=search]::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
+.clear-x { border: 0; background: none; cursor: pointer; font-size: 18px; line-height: 1; padding: 4px 8px; color: var(--tinta-suave); }
+.pill .sep { width: 1px; align-self: stretch; margin: 10px 0; background: var(--linea); flex: none; }
+.pill select {
+  font-family: var(--display); font-size: 14px; color: var(--tinta-suave); background: transparent; border: 0; border-radius: 999px;
+  padding: 8px 26px 8px 14px; cursor: pointer; max-width: 170px; text-overflow: ellipsis;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236A645A' stroke-width='1.4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+}
+.pill select:hover { color: var(--tinta); }
+.pill select:focus-visible { outline: 2px dashed var(--azul); outline-offset: 0; }
+.pill select.active { color: #fff; background-color: var(--azul);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23ffffff' stroke-width='1.4'/%3E%3C/svg%3E"); }
+
+/* ---------- resultados ---------- */
+.results-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 24px 0 8px; flex-wrap: wrap; }
+.count { font-family: var(--mano); font-weight: 900; font-size: 19px; margin: 0; }
+.reset { border: 0; background: none; font-family: var(--mono); text-transform: uppercase; font-size: 12px; letter-spacing: .06em; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; color: var(--vino); padding: 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 40px 28px; padding: 18px 0 72px; }
+
+.card { border: 0; background: none; padding: 0; cursor: pointer; display: grid; justify-items: center; text-align: center; gap: 4px; }
+.card .frame { width: 100%; max-width: 230px; transition: transform .2s ease; }
+.card:nth-child(3n+1) .frame { transform: rotate(-1.6deg); }
+.card:nth-child(3n+2) .frame { transform: rotate(1.2deg); }
+.card:hover .frame { transform: rotate(0) scale(1.03); }
+.card h3 { margin: 12px 0 0; font-weight: 800; font-variation-settings: "wdth" 75; text-transform: uppercase; font-size: 26px; line-height: .95; color: var(--tc); letter-spacing: .01em; }
+.card .what { font-family: var(--mano); font-weight: 900; font-size: 15px; line-height: 1.25; color: var(--tc); margin: 0; max-width: 24ch; }
+.card .what b { font-weight: 900; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.card .where { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-suave); margin: 4px 0 0; }
+
+/* ---------- marco de crayón ---------- */
+.frame { position: relative; aspect-ratio: 4 / 5; padding: 11%; }
+.frame-bg { position: absolute; inset: 0; background: var(--fc); filter: url(#crayon); }
+.frame-bg::after { content: ""; position: absolute; inset: 0; mix-blend-mode: multiply; opacity: .55;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.6 1.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); }
+.frame .pic { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--papel-2); display: grid; place-items: center; }
+.frame .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.frame .pic .ini { font-family: var(--mano); font-weight: 900; font-size: clamp(40px, 7vw, 70px); color: var(--tc); line-height: 1; }
+.frame .m { position: absolute; width: 9%; aspect-ratio: 1; color: var(--mc); transform: translate(-50%, -50%) rotate(var(--r, 0deg)); filter: url(#crayon-s); }
+.frame .m svg { width: 100%; height: 100%; display: block; }
+
+.fund { position: absolute; z-index: 2; top: -6%; right: -7%; width: 26%; aspect-ratio: 1; color: #F2CF4A; filter: url(#crayon-s) drop-shadow(1px 2px 0 rgba(31,29,26,.35)); transform: rotate(12deg); }
+.fund svg { width: 100%; height: 100%; display: block; }
+.fund-tag { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--tc); border: 1px solid currentColor; padding: 2px 9px; border-radius: 999px; margin-top: 6px; }
+.fund-tag svg { width: 11px; height: 11px; color: #E2B73A; }
+.empty { grid-column: 1 / -1; padding: 48px 0; }
+.empty p.big { font-family: var(--mano); font-weight: 900; font-size: 30px; margin: 0; line-height: 1; }
+.empty p { margin: 8px 0 0; color: var(--tinta-suave); max-width: 52ch; }
+
+/* ---------- perfil ---------- */
+dialog { border: 0; padding: 0; background: transparent; max-width: min(900px, calc(100vw - 24px)); width: 100%; max-height: calc(100vh - 24px); }
+dialog::backdrop { background: rgba(31, 29, 26, .5); }
+.sheet { position: relative; overflow: hidden; background: #EDE7DA; border-radius: 6px; padding: clamp(22px, 4vw, 44px); }
+.sheet::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0; background: url("papel.jpg") center / cover no-repeat; }
+.sheet .card-note, .sheet .btn:not(.primary), .sheet .close { background: #EDE7DA; }
+.sheet .card-note { background: transparent; }
+.sheet .pattern { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.sheet .pattern .big { position: absolute; color: var(--mc); opacity: .9; filter: url(#crayon); }
+.sheet .pattern .big svg { width: 100%; height: 100%; display: block; }
+.sheet-inner { position: relative; display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: clamp(22px, 4vw, 44px); align-items: start; }
+.p-left { display: grid; justify-items: center; gap: 6px; }
+.p-left .frame { width: 100%; transform: rotate(-1.5deg); }
+.p-left h2 { margin: 14px 0 0; font-weight: 800; font-variation-settings: "wdth" 75; text-transform: uppercase; font-size: 40px; line-height: .92; color: var(--tc); text-align: center; text-wrap: balance; }
+.p-left .what { font-family: var(--mano); font-weight: 900; font-size: 18px; line-height: 1.2; color: var(--tc); margin: 0; text-align: center; }
+.card-note { background: var(--papel-2); border: 1.5px solid var(--linea); padding: 22px 22px 18px; box-shadow: 0 1px 0 var(--linea); position: relative; }
+.card-note h4 { margin: 0 0 14px; font-family: var(--mono); font-weight: 700; font-size: 18px; letter-spacing: .08em; text-transform: uppercase; text-align: center; }
+.card-note h4 .circ { position: relative; padding: 0 .2em; }
+.card-note h4 .circ svg { position: absolute; left: -10%; top: -35%; width: 120%; height: 170%; overflow: visible; color: var(--tc); }
+.rowl { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: end; padding: 7px 0; }
+.rowl .lab { font-family: var(--mono); font-size: 12.5px; text-transform: uppercase; letter-spacing: .07em; white-space: nowrap; padding-bottom: 4px; }
+.rowl .ans { font-family: var(--mano); font-weight: 900; font-size: 16.5px; line-height: 1.3; border-bottom: 1.5px solid var(--linea); padding: 0 4px 2px; min-height: 28px; overflow-wrap: anywhere; }
+.rowl .ans a { text-decoration: none; }
+.rowl .ans a:hover { text-decoration: underline; }
+.rowl.stack { grid-template-columns: 1fr; gap: 2px; }
+.rowl.stack .ans { display: grid; gap: 2px; }
+.sticker { display: inline-block; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; background: var(--tc); color: #fff; padding: 2px 8px; border-radius: 999px; margin-left: 6px; vertical-align: middle; transform: rotate(-3deg); }
+.contact { display: grid; gap: 8px; margin-top: 18px; }
+.btn { display: flex; align-items: center; justify-content: space-between; gap: 10px; text-decoration: none; border: 2px solid var(--tinta); border-radius: 14px; padding: 11px 14px; background: var(--papel-2); box-shadow: 3px 3px 0 var(--tinta); font-weight: 600; }
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--tinta); }
+.btn.primary { background: var(--tc); color: #fff; border-color: var(--tinta); }
+.btn small { display: block; font-family: var(--mono); font-weight: 400; font-size: 11px; letter-spacing: .05em; opacity: .8; text-transform: uppercase; }
+.note { font-family: var(--mano); font-weight: 900; font-size: 16px; color: var(--tinta-suave); margin: 0; }
+.close { position: absolute; top: 12px; right: 12px; z-index: 3; width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--tinta); background: var(--papel-2); cursor: pointer; font-size: 22px; line-height: 1; box-shadow: 2px 2px 0 var(--tinta); }
+
+footer { border-top: 1.5px dashed var(--linea); padding: 26px 0 40px; color: var(--tinta-suave); font-size: 14px; }
+footer .sig { font-family: var(--mano); font-weight: 900; font-size: 20px; color: var(--vino); }
+
+@media (max-width: 760px) {
+  .top-grid { grid-template-columns: 1fr; }
+  .pill { flex-wrap: wrap; border-radius: 22px; padding: 4px 6px 6px 16px; }
+  .pill .q { flex-basis: 100%; }
+  .pill .sep { display: none; }
+  .pill select { flex: 1 1 0; min-width: 0; max-width: none; font-size: 12.5px; padding: 7px 20px 7px 8px; background-position: right 6px center; }
+  .search-bar { position: static; }
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 30px 16px; }
+  .card h3 { font-size: 21px; } .card .what { font-size: 13.5px; }
+  .sheet-inner { grid-template-columns: 1fr; }
+  .p-left .frame { max-width: 260px; }
+}
+@media (prefers-reduced-motion: reduce) { .card .frame { transition: none; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="crayon" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="crayon-s" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="2" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <symbol id="m-star" viewBox="0 0 100 100"><path fill="currentColor" d="M50 4 L62 36 L96 38 L69 59 L79 94 L50 74 L21 94 L31 59 L4 38 L38 36 Z"/></symbol>
+    <symbol id="m-heart" viewBox="0 0 100 100"><path fill="currentColor" d="M50 90 C 18 68 4 50 6 31 C 8 14 26 6 40 14 C 45 17 48 22 50 26 C 52 22 55 17 60 14 C 74 6 92 14 94 31 C 96 50 82 68 50 90 Z"/></symbol>
+    <symbol id="m-flower" viewBox="0 0 100 100"><g fill="currentColor"><circle cx="50" cy="22" r="19"/><circle cx="77" cy="42" r="19"/><circle cx="67" cy="75" r="19"/><circle cx="33" cy="75" r="19"/><circle cx="23" cy="42" r="19"/></g><circle cx="50" cy="51" r="13" fill="#fff" opacity=".75"/></symbol>
+    <symbol id="m-sun" viewBox="0 0 100 100"><g fill="currentColor"><circle cx="50" cy="50" r="22"/><g stroke="currentColor" stroke-width="8" stroke-linecap="round"><path d="M50 6v14M50 80v14M6 50h14M80 50h14M19 19l10 10M71 71l10 10M81 19 71 29M29 71 19 81"/></g></g></symbol>
+    <symbol id="m-sparkle" viewBox="0 0 100 100"><path fill="currentColor" d="M50 2 C 54 36 64 46 98 50 C 64 54 54 64 50 98 C 46 64 36 54 2 50 C 36 46 46 36 50 2 Z"/></symbol>
+    <symbol id="m-circle" viewBox="0 0 120 50"><path fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" d="M70 6 C 30 2 4 12 6 27 C 8 42 50 47 82 43 C 108 40 118 30 113 19 C 108 8 80 4 58 8"/></symbol>
+  </defs>
+</svg>
+
+<header class="top">
+  <div class="wrap top-grid">
+    <div>
+      <h1>Galería de creadores</h1>
+      <div class="brand-row"><img class="logo-nombre" src="logo-nombre.png" alt="El Refugio"><img class="logo-casa" src="logo-casa.png" alt="" aria-hidden="true"></div>
+      <p class="lede">¡Conoce, conecta y haz networking con los miembros de El Refugio!</p>
+    </div>
+    <ul class="stats" id="stats"></ul>
+  </div>
+</header>
+
+<div class="search-bar">
+  <div class="wrap">
+    <div class="pill">
+      <label class="q" for="q">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="q" type="search" autocomplete="off" placeholder="Busca escritores, Caracas, ilustradoras en Madrid…" aria-label="Buscar creativos">
+        <button class="clear-x" id="clearQ" type="button" aria-label="Borrar búsqueda" hidden>×</button>
+      </label>
+      <span class="sep" aria-hidden="true"></span>
+      <select id="area" aria-label="Filtrar por área"></select>
+      <span class="sep" aria-hidden="true"></span>
+      <select id="pais" aria-label="Filtrar por país"></select>
+      <span class="sep" aria-hidden="true"></span>
+      <select id="ciudad" aria-label="Filtrar por ciudad"></select>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="results-head">
+    <p class="count" id="count" aria-live="polite"></p>
+    <button class="reset" id="reset" type="button" hidden>Quitar filtros</button>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="sig">ya no tienes que caminar solo el camino creativo 🏠</span><br>
+    Galería exclusiva para miembros de El Refugio. ¿Algo de tu perfil está desactualizado? Escribe a <a href="mailto:hello@elrefugiocreativo.com">hello@elrefugiocreativo.com</a>
+  </div>
+</footer>
+
+<dialog id="perfil" aria-labelledby="pName">
+  <div class="sheet" id="sheet"></div>
+</dialog>
+
+<script>
+let MIEMBROS = [];
+const norm = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+const esc = s => (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = id => document.getElementById(id);
+
+/* ---------- estilos por miembro: color del marco + dibujito ---------- */
+const AZ = ['#8CA0B1', '#5E7387'], LI = ['#98869C', '#6E5D72'], DO = ['#DFC897', '#977A35'], SA = ['#919F8E', '#5D6C5A'];
+const CREMA = '#EDE7DA';
+const STYLES = [
+  { fc: '#4E5B81', tc: '#4E5B81', mc: DO[0], m: 'star' },
+  { fc: LI[0], tc: LI[1], mc: CREMA, m: 'heart' },
+  { fc: '#8E242A', tc: '#8E242A', mc: '#F2B9C0', m: 'flower' },
+  { fc: SA[0], tc: SA[1], mc: CREMA, m: 'sparkle' },
+  { fc: '#C2462B', tc: '#B23E25', mc: '#F2CF4A', m: 'sun' },
+  { fc: AZ[0], tc: AZ[1], mc: DO[0], m: 'heart' },
+  { fc: '#2F6B5B', tc: '#2F6B5B', mc: '#F2CF4A', m: 'sparkle' },
+  { fc: DO[0], tc: DO[1], mc: '#8E242A', m: 'star' },
+];
+const styleOf = m => STYLES[m.id % STYLES.length];
+function hash(n) { let h = 2166136261; for (const ch of String(n)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0); }
+
+function frameHTML(m, big) {
+  const st = styleOf(m);
+  // dibujitos repartidos sobre el borde (en % del marco)
+  const pts = [];
+  const nx = big ? 6 : 5, ny = big ? 7 : 6;
+  for (let i = 0; i < nx; i++) { const x = 8 + i * (84 / (nx - 1)); pts.push([x, 4.4], [x, 95.6]); }
+  for (let j = 1; j < ny - 1; j++) { const y = 4.4 + j * (91.2 / (ny - 1)); pts.push([5.5, y], [94.5, y]); }
+  const h = hash(m.nombre + m.id);
+  const motifs = pts.map(([x, y], k) => {
+    const r = ((h >> (k % 24)) % 40) - 20;
+    return `<span class="m" style="left:${x}%;top:${y}%;--r:${r}deg"><svg><use href="#m-${st.m}"/></svg></span>`;
+  }).join('');
+  const ini = m.nombre.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  const pic = m.foto ? `<img src="${esc(m.foto)}" alt="" loading="lazy">` : `<span class="ini">${esc(ini)}</span>`;
+    return `<div class="frame" style="--fc:${st.fc};--tc:${st.tc};--mc:${st.mc}"><div class="frame-bg"></div><div class="pic">${pic}</div>${motifs}</div>`;
+}
+
+const placeText = m => {
+  const parts = [...m.ciudades];
+  if (m.region && !parts.includes(m.region)) parts.push(m.region);
+  if (m.pais && !parts.includes(m.pais)) parts.push(m.pais);
+  return parts.join(', ');
+};
+const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const cumpleText = c => { if (!c) return ''; const [mm, dd] = c.split('-').map(Number); return `${dd} de ${MESES[mm - 1]}`; };
+const cumpleEsteMes = c => c && Number(c.split('-')[0]) === new Date().getMonth() + 1;
+
+function prep() {
+  MIEMBROS.forEach((m, i) => {
+    m.id = i;
+    m.links = m.links || [];
+    m._lugar = norm([...m.ciudades, m.region, m.pais].join(' '));
+    m._hay = norm([m.nombre, ...m.ciudades, m.region, m.pais, ...m.areas, m.contacto.instagram, m.dato].join(' | '));
+  });
+}
+
+/* ---------- buscador con sinónimos ("escritores" → Escritura) ---------- */
+const SIN = [
+  [['escrit','redact','copy','autor','poet','guion','guionist','narrad','periodis'], ['Escritura']],
+  [['editorial','corrector','correccion'], ['Edición editorial','Escritura']],
+  [['foto'], ['Fotografía']],
+  [['disen','grafic','brand','logo','identidad'], ['Diseño Gráfico','Diseño Web']],
+  [['web','pagina'], ['Diseño Web']],
+  [['ilustr','dibuj'], ['Ilustración']],
+  [['video','reel','montaj','youtube'], ['Edición de Video']],
+  [['editor','edicion'], ['Edición de Video','Edición editorial']],
+  [['audiovis','realizad','filmmak'], ['Dirección Audiovisual','Cine','Edición de Video']],
+  [['cine','film','pelicul'], ['Cine','Dirección Audiovisual']],
+  [['music','cantant','compositor','canci'], ['Música']],
+  [['sonid','audio','productor','mezcl','podcast'], ['Sonido','Música']],
+  [['market','mercad','redes','community','social','contenido','ventas'], ['Marketing']],
+  [['estrateg','marca'], ['Estrategia Creativa']],
+  [['direccion creativa','director creativ','directora creativ'], ['Dirección Creativa']],
+  [['psico','terap'], ['Psicología']],
+  [['anima','motion'], ['Animación']],
+  [['teatr','actor','actriz','actua','escenic','danz'], ['Teatro','Artes escénicas']],
+  [['moda','ropa','fashion'], ['Moda','Confección']],
+  [['costur','confecc'], ['Confección']],
+  [['arquitect'], ['Arquitectura']],
+  [['pint','arte plast'], ['Pintura']],
+  [['datos','analis','data'], ['Análisis de datos']],
+  [['seo','posicionam'], ['SEO']],
+  [['collag','colla'], ['Collage']],
+  [['papel','stationer'], ['Papelería creativa']],
+  [['coach','mentor'], ['Coaching creativo']],
+];
+const LUG = [
+  [['venezol'], 'venezuela'], [['argentin'], 'argentina'], [['chilen'], 'chile'],
+  [['ecuator'], 'ecuador'], [['espan','madrilen'], 'espana'], [['uruguay'], 'uruguay'],
+  [['panam'], 'panama'], [['italia'], 'italia'],
+  [['usa','eeuu','gringo','estadounid'], 'estados unidos'], [['caraque'], 'caracas'],
+  [['barquisimet','guaro'], 'barquisimeto'], [['merid','gocho'], 'merida'], [['porten'], 'buenos aires'],
+];
+const STOP = new Set(['de','del','en','la','el','los','las','y','que','con','para','por','a','un','una','unos','unas','busco','quiero','gente','personas']);
+
+function tokenMatches(m, t) {
+  if (m._hay.includes(t)) return 'texto';
+  for (const [stems, areas] of SIN) {
+    if (stems.some(s => t.startsWith(s) || (t.length >= 4 && s.startsWith(t)))) {
+      const hit = areas.filter(a => m.areas.includes(a));
+      if (hit.length) return hit;
+    }
+  }
+  for (const [stems, place] of LUG) {
+    if (stems.some(s => t.startsWith(s)) && m._lugar.includes(place)) return 'lugar';
+  }
+  return null;
+}
+function search(m, q) {
+  const qn = norm(q);
+  if (!qn) return { ok: true, hits: [] };
+  if (m._hay.includes(qn)) return { ok: true, hits: m.areas.filter(a => norm(a).includes(qn)) };
+  const toks = qn.split(/[\s,]+/).filter(t => t && !STOP.has(t));
+  const hits = [];
+  for (const t of toks) {
+    const r = tokenMatches(m, t);
+    if (!r) return { ok: false };
+    if (Array.isArray(r)) hits.push(...r);
+    else hits.push(...m.areas.filter(a => norm(a).includes(t)));
+  }
+  return { ok: true, hits };
+}
+
+/* ---------- estado y filtros ---------- */
+const state = { q: '', area: null, pais: '', ciudad: '' };
+const countBy = arr => arr.reduce((acc, k) => (acc[k] = (acc[k] || 0) + 1, acc), {});
+let areaCount, AREAS, paisCount, PAISES, ciudadPais;
+function computeIndex() {
+  areaCount = countBy(MIEMBROS.flatMap(m => m.areas));
+  AREAS = Object.keys(areaCount).sort((a, b) => areaCount[b] - areaCount[a] || a.localeCompare(b, 'es'));
+  paisCount = countBy(MIEMBROS.map(m => m.pais).filter(Boolean));
+  PAISES = Object.keys(paisCount).sort((a, b) => a.localeCompare(b, 'es'));
+  ciudadPais = {};
+  MIEMBROS.forEach(m => m.ciudades.forEach(c => { ciudadPais[c + '|' + m.pais] = { c, p: m.pais }; }));
+  $('stats').innerHTML = [[MIEMBROS.length, 'creativos'], [Object.keys(ciudadPais).length, 'ciudades'], [PAISES.length, 'países']]
+    .map(([n, l]) => `<li><strong>${n}</strong><span>${l}</span></li>`).join('');
+}
+function fillSelects() {
+  $('pais').innerHTML = '<option value="">País</option>' +
+    PAISES.map(p => `<option value="${esc(p)}"${p === state.pais ? ' selected' : ''}>${esc(p)} (${paisCount[p]})</option>`).join('');
+  const ciudades = Object.values(ciudadPais).filter(x => !state.pais || x.p === state.pais).sort((a, b) => a.c.localeCompare(b.c, 'es'));
+  const dup = countBy(ciudades.map(x => x.c));
+  $('ciudad').innerHTML = '<option value="">Ciudad</option>' + ciudades.map(x => {
+    const v = x.c + '|' + x.p; const label = dup[x.c] > 1 ? `${x.c} (${x.p})` : x.c;
+    return `<option value="${esc(v)}"${v === state.ciudad ? ' selected' : ''}>${esc(label)}</option>`;
+  }).join('');
+  $('pais').classList.toggle('active', !!state.pais);
+  $('ciudad').classList.toggle('active', !!state.ciudad);
+}
+function renderChips() {
+  $('area').innerHTML = '<option value="">Área</option>' +
+    AREAS.map(a => `<option value="${esc(a)}"${a === state.area ? ' selected' : ''}>${esc(a)} (${areaCount[a]})</option>`).join('');
+  $('area').classList.toggle('active', !!state.area);
+}
+function whatLine(m, hits) {
+  const tags = [...m.areas].sort((a, b) => hits.has(b) - hits.has(a)).slice(0, 3);
+  return tags.map(a => hits.has(a) ? `<b>${esc(a.toLowerCase())}</b>` : esc(a.toLowerCase())).join(' · ');
+}
+function render() {
+  const visible = [];
+  for (const m of MIEMBROS) {
+    if (state.area && !m.areas.includes(state.area)) continue;
+    if (state.pais && m.pais !== state.pais) continue;
+    if (state.ciudad) { const [c, p] = state.ciudad.split('|'); if (!(m.ciudades.includes(c) && m.pais === p)) continue; }
+    const r = search(m, state.q);
+    if (!r.ok) continue;
+    visible.push({ m, hits: new Set([...(r.hits || []), ...(state.area ? [state.area] : [])]) });
+  }
+  const filtered = state.q || state.area || state.pais || state.ciudad;
+  $('count').textContent = filtered
+    ? `${visible.length} ${visible.length === 1 ? 'creativo encontrado' : 'creativos encontrados'}`
+    : '';
+  $('reset').hidden = !filtered;
+  $('clearQ').hidden = !state.q;
+  if (!visible.length) {
+    $('grid').innerHTML = `<div class="empty"><p class="big">nadie por aquí… todavía.</p><p>No encontramos creativos con esa búsqueda. Prueba con otra palabra (por ejemplo “diseño” en vez de “branding”) o quita algún filtro.</p></div>`;
+    return;
+  }
+  $('grid').innerHTML = visible.map(({ m, hits }) => {
+    const st = styleOf(m);
+    return `<button class="card" type="button" data-id="${m.id}" style="--fc:${st.fc};--tc:${st.tc}" aria-label="Ver perfil de ${esc(m.nombre)}${m.fundador ? ', miembro fundador' : ''}">
+      ${frameHTML(m, false)}
+      <h3>${esc(m.nombre)}</h3>
+      <p class="what">${whatLine(m, hits)}</p>
+      <p class="where">${esc(placeText(m))}</p>
+    </button>`;
+  }).join('');
+}
+
+/* ---------- perfil ---------- */
+function describe(u) {
+  let host = '';
+  try { host = new URL(u).hostname.replace(/^www\./, ''); } catch (e) { host = u; }
+  const ig = u.match(/instagram\.com\/([^/?#]+)/i);
+  if (ig) return '@' + ig[1];
+  const map = [[/behance\.net/, 'su behance'], [/substack\.com/, 'su substack'], [/spotify\.com/, 'su música en spotify'],
+    [/youtube\.com|youtu\.be/, 'su canal de youtube'], [/tiktok\.com/, 'su tiktok'], [/linkedin\.com/, 'su linkedin'],
+    [/drive\.google\.com/, 'su portafolio (drive)'], [/notion\.(so|site)/, 'su portafolio (notion)'],
+    [/canva\.site|carrd\.co|beacons\.ai|heyzine\.com|wixsite\.com|linktr\.ee/, 'su portafolio web']];
+  for (const [re, label] of map) if (re.test(host)) return label;
+  return host;
+}
+function patternHTML(m) {
+  const st = styleOf(m), h = hash(m.nombre);
+  const spots = [[-4, -6, 22], [78, -8, 20], [88, 30, 16], [-6, 44, 18], [70, 78, 22], [10, 86, 16], [40, -10, 12], [44, 92, 14]];
+  return `<div class="pattern" style="--mc:${st.mc}">${spots.map(([x, y, s], k) =>
+    `<span class="big" style="left:${x}%;top:${y}%;width:${s}%;aspect-ratio:1;transform:rotate(${((h >> k) % 50) - 25}deg)"><svg><use href="#m-${st.m}"/></svg></span>`).join('')}</div>`;
+}
+function openPerfil(id) {
+  const m = MIEMBROS[id], c = m.contacto, st = styleOf(m);
+  const rows = [];
+  rows.push(`<div class="rowl"><span class="lab">vive en:</span><span class="ans">${esc(placeText(m))}</span></div>`);
+  rows.push(`<div class="rowl"><span class="lab">a qué se dedica:</span><span class="ans">${esc(m.areas.join(', ').toLowerCase())}</span></div>`);
+  if (m.cumple) rows.push(`<div class="rowl"><span class="lab">cumpleaños:</span><span class="ans">${esc(cumpleText(m.cumple))}${cumpleEsteMes(m.cumple) ? '<span class="sticker">¡este mes!</span>' : ''}</span></div>`);
+  if (m.dato) rows.push(`<div class="rowl"><span class="lab">dato random:</span><span class="ans">${esc(m.dato)}</span></div>`);
+  const work = [];
+  if (c.instagram) work.push(`<a href="https://www.instagram.com/${encodeURIComponent(c.instagram)}/" target="_blank" rel="noopener">@${esc(c.instagram)} ↗</a>`);
+  m.links.forEach(u => work.push(`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(describe(u))} ↗</a>`));
+  rows.push(`<div class="rowl stack"><span class="lab">su trabajo:</span><span class="ans">${work.length ? work.join('') : '<span style="color:var(--tinta-suave)">todavía no lo ha compartido</span>'}</span></div>`);
+
+  const contacts = [];
+  if (c.instagram) contacts.push(`<a class="btn primary" href="https://ig.me/m/${encodeURIComponent(c.instagram)}" target="_blank" rel="noopener"><span>Escribir por Instagram<small>mensaje directo a @${esc(c.instagram)}</small></span><span aria-hidden="true">↗</span></a>`);
+  if (c.whatsapp) contacts.push(`<a class="btn" href="https://wa.me/${esc(c.whatsapp.replace(/\D/g, ''))}" target="_blank" rel="noopener"><span>WhatsApp<small>${esc(c.whatsapp)}</small></span><span aria-hidden="true">↗</span></a>`);
+  if (c.email) contacts.push(`<a class="btn" href="mailto:${esc(c.email)}"><span>Email<small>${esc(c.email)}</small></span><span aria-hidden="true">↗</span></a>`);
+
+  $('sheet').style.setProperty('--fc', st.fc); $('sheet').style.setProperty('--tc', st.tc);
+  $('sheet').innerHTML = `
+    <button class="close" type="button" aria-label="Cerrar perfil" data-close>×</button>
+    <div class="sheet-inner">
+      <div class="p-left">
+        ${frameHTML(m, true)}
+        <h2 id="pName">${esc(m.nombre)}</h2>
+        <p class="what">${esc(m.areas.slice(0, 2).join(' & ').toLowerCase())}</p>${m.fundador ? '<span class="fund-tag"><svg viewBox="0 0 100 100"><use href="#m-star"/></svg>miembro fundador</span>' : ''}
+      </div>
+      <div>
+        <div class="card-note">
+          <h4>cosas de <span class="circ">${esc(m.nombre.split(' ')[0].toLowerCase())}<svg viewBox="0 0 120 50" preserveAspectRatio="none"><use href="#m-circle"/></svg></span></h4>
+          ${rows.join('')}
+          <div class="contact">${contacts.length ? contacts.join('') : '<p class="note">Este perfil todavía no tiene datos de contacto. Escribe a hello@elrefugiocreativo.com y te ayudamos a conectar.</p>'}</div>
+        </div>
+      </div>
+    </div>`;
+  const d = $('perfil');
+  if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
+}
+
+/* ---------- eventos ---------- */
+$('q').addEventListener('input', e => { state.q = e.target.value; render(); });
+$('clearQ').addEventListener('click', () => { state.q = ''; $('q').value = ''; $('q').focus(); render(); });
+$('pais').addEventListener('change', e => { state.pais = e.target.value; state.ciudad = ''; fillSelects(); render(); });
+$('ciudad').addEventListener('change', e => { state.ciudad = e.target.value; fillSelects(); render(); });
+$('area').addEventListener('change', e => { state.area = e.target.value || null; renderChips(); render(); });
+$('reset').addEventListener('click', () => { Object.assign(state, { q: '', area: null, pais: '', ciudad: '' }); $('q').value = ''; fillSelects(); renderChips(); render(); });
+$('grid').addEventListener('click', e => { const c = e.target.closest('.card'); if (c) openPerfil(+c.dataset.id); });
+$('perfil').addEventListener('click', e => { if (e.target.closest('[data-close]') || e.target === $('perfil')) $('perfil').close(); });
+
+async function boot() {
+  try {
+    const r = await fetch('miembros.json', { cache: 'no-store' });
+    if (!r.ok) throw new Error(r.status);
+    MIEMBROS = await r.json();
+  } catch (e) {
+    $('grid').innerHTML = `<div class="empty"><p class="big">no pudimos cargar la galería.</p><p>Recarga la página en un momento. Si sigue sin aparecer, avísale a Ani.</p></div>`;
+    return;
+  }
+  prep(); computeIndex(); fillSelects(); renderChips(); render();
+}
+boot();
+</script>
+</body>
+</html>
